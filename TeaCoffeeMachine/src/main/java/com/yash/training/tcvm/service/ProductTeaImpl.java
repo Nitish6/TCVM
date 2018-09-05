@@ -3,6 +3,7 @@ package com.yash.training.tcvm.service;
 import java.util.Map;
 import java.util.Optional;
 
+import com.yash.training.tcvm.CustomException.InvalidInputException;
 import com.yash.training.tcvm.dao.ConsumptionMaterialQuantity;
 import com.yash.training.tcvm.dao.ProductCost;
 import com.yash.training.tcvm.dao.WasteMaterial;
@@ -26,13 +27,17 @@ public class ProductTeaImpl implements Product {
 		this.productParameters = ProductParameters.getInstance();
 		this.materialManager = new MaterialManager();
 		this.productCost = new ProductCost();
+		this.wasteMaterial = new WasteMaterial();
 	} 
 
-	public ProductTeaImpl(ProductParameters productParameters, ConsumptionMaterialQuantity consume, MaterialManager materialManager, ProductCost productCost) {
+	public ProductTeaImpl(ProductParameters productParameters, ConsumptionMaterialQuantity consume, 
+			MaterialManager materialManager, ProductCost productCost, WasteMaterial wasteMaterial) {
+		
 		this.productParameters = productParameters;
 		this.consume = consume;
 		this.materialManager = materialManager;
 		this.productCost = productCost;
+		this.wasteMaterial = wasteMaterial;
 	}
 
 	public Boolean checkProductMaterialsQuantityAvailability(Integer drinkCount){
@@ -56,7 +61,7 @@ public class ProductTeaImpl implements Product {
 			return true;
 
 		} else{
-			throw new RuntimeException("Not enough material present. Please reorder ");
+			throw new InvalidInputException("invalid input");
 		}
 	}
 
@@ -71,8 +76,7 @@ public class ProductTeaImpl implements Product {
 
 	public ProductParameters getProductParameters(Integer drinkCount,  Double totalCurrentOrderCost){
 
-		wasteMaterial = new WasteMaterial();
-
+		productParameters = ProductParameters.getInstance();
 		productParameters.setTeaCount(Optional.ofNullable(productParameters.getTeaCount()).orElse(0) + drinkCount);
 		productParameters.setTotalTeaCost(Optional.ofNullable(productParameters.getTotalTeaCost()).orElse(0.0) + totalCurrentOrderCost);
 

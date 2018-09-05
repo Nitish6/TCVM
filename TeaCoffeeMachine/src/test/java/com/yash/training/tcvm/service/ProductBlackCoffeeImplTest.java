@@ -12,10 +12,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.yash.training.tcvm.dao.ConsumptionMaterialQuantity;
 import com.yash.training.tcvm.dao.ProductCost;
+import com.yash.training.tcvm.dao.WasteMaterial;
 import com.yash.training.tcvm.domain.Container;
 import com.yash.training.tcvm.domain.ProductParameters;
 
@@ -39,6 +41,9 @@ public class ProductBlackCoffeeImplTest {
 
 	@Mock
 	private ProductParameters productParameters;
+
+	@Mock
+	private WasteMaterial wasteMaterial;
 
 	@Before
 	public void shouldinitializeContainer(){
@@ -113,15 +118,45 @@ public class ProductBlackCoffeeImplTest {
 		cost.put("black coffee", 10d);
 
 		when(productCost.getProductCost()).thenReturn(cost);
+		when(wasteMaterial.getBlackCoffeeWastage()).thenReturn(getWasteBlackCoffee());
 
 		Double actualCost = blackCoffeeImpl.getProductCost(drinkCount);
 
-		Double expectedCost = 20.0;
-
-		assertEquals(expectedCost, actualCost);
-
 		verify(productCost).getProductCost();
+		verify(wasteMaterial, Mockito.atLeast(3)).getBlackCoffeeWastage();
+
+		assertEquals((Double)20.0, actualCost);
 
 	}
 
+	@Test
+	public void shouldReturnCountTotalCostTotalWastageOfBlackCoffee(){
+
+		Integer drinkCount = 2;
+		Double currentOrderCost = 10.0;
+
+		productParameters = ProductParameters.getInstance();
+		productParameters.setWaterWaste(0.0);
+		productParameters.setTotalBlackCoffeeCost(0.0);
+		
+		when(wasteMaterial.getBlackCoffeeWastage()).thenReturn(getWasteBlackCoffee());
+
+		ProductParameters actual = blackCoffeeImpl.getProductParameters(drinkCount, currentOrderCost);
+
+		verify(wasteMaterial, Mockito.atLeast(3)).getBlackCoffeeWastage();
+
+		assertEquals((Integer)2, actual.getBlackCoffeeCount());
+		assertEquals(10.0, actual.getTotalBlackCoffeeCost(), 0);
+	}
+
+	private Map<String, Double> getWasteBlackCoffee(){
+
+		Map<String, Double> wasteBlackCoffeeIngredients = new HashMap<>();
+
+		wasteBlackCoffeeIngredients.put("coffee", 0.0);
+		wasteBlackCoffeeIngredients.put("water", 12.0);
+		wasteBlackCoffeeIngredients.put("sugar", 2.0);
+
+		return wasteBlackCoffeeIngredients;
+	}
 }

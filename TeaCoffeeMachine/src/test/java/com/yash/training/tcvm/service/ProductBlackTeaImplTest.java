@@ -12,10 +12,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.yash.training.tcvm.dao.ConsumptionMaterialQuantity;
 import com.yash.training.tcvm.dao.ProductCost;
+import com.yash.training.tcvm.dao.WasteMaterial;
 import com.yash.training.tcvm.domain.Container;
 import com.yash.training.tcvm.domain.ProductParameters;
 
@@ -40,6 +42,9 @@ public class ProductBlackTeaImplTest {
 
 	@Mock
 	private ProductParameters productParameters;
+
+	@Mock
+	private WasteMaterial wasteMaterial;
 
 	@Before
 	public void shouldinitializeContainer(){
@@ -116,15 +121,46 @@ public class ProductBlackTeaImplTest {
 		cost.put("black coffee", 10d);
 
 		when(productCost.getProductCost()).thenReturn(cost);
+		when(wasteMaterial.getBlackTeaWastage()).thenReturn(getWasteBlackTea());
 
 		Double actualCost = blackTeaImpl.getProductCost(drinkCount);
 
-		Double expectedCost = 10.0;
-
 		verify(productCost).getProductCost();
+		verify(wasteMaterial, Mockito.atLeast(3)).getBlackTeaWastage();
 
-		assertEquals(expectedCost, actualCost);
+		assertEquals((Double)10.0, actualCost);
 
 	}
 
+	@Test
+	public void shouldReturnCountTotalCostTotalWastageOfBlackTea(){
+
+		Integer drinkCount = 2;
+		Double currentOrderCost = 10.0;
+
+		productParameters = ProductParameters.getInstance();
+		productParameters.setWaterWaste(0.0);
+		productParameters.setTotalBlackTeaCost(0.0);
+
+		when(wasteMaterial.getBlackTeaWastage()).thenReturn(getWasteBlackTea());
+
+		ProductParameters actual = blackTeaImpl.getProductParameters(drinkCount, currentOrderCost);
+
+		verify(wasteMaterial, Mockito.atLeast(3)).getBlackTeaWastage();
+
+		assertEquals((Integer)2, actual.getBlackTeaCount());
+		assertEquals(24.0, actual.getWaterWaste(), 0);
+		assertEquals(10.0, actual.getTotalBlackTeaCost(), 0);
+	}
+
+	private Map<String, Double> getWasteBlackTea(){
+
+		Map<String, Double> wasteBlackTeaIngredients = new HashMap<>();
+
+		wasteBlackTeaIngredients.put("tea", 0.0);
+		wasteBlackTeaIngredients.put("water", 12.0);
+		wasteBlackTeaIngredients.put("sugar", 2.0);
+
+		return wasteBlackTeaIngredients;
+	}
 }

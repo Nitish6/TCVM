@@ -26,13 +26,17 @@ public class ProductBlackCoffeeImpl implements Product {
 		this.productParameters = ProductParameters.getInstance();
 		this.materialManager = new MaterialManager();
 		this.productCost = new ProductCost();
+		this.wasteMaterial = new WasteMaterial();
 	} 
 
-	public ProductBlackCoffeeImpl(ProductParameters productParameters, ConsumptionMaterialQuantity consume, MaterialManager materialManager, ProductCost productCost) {
+	public ProductBlackCoffeeImpl(ProductParameters productParameters,
+			ConsumptionMaterialQuantity consume, MaterialManager materialManager, ProductCost productCost, WasteMaterial wasteMaterial) {
+
 		this.productParameters = productParameters;
 		this.consume = consume;
 		this.materialManager = materialManager;
 		this.productCost = productCost;
+		this.wasteMaterial = wasteMaterial;
 	}
 
 	public Boolean checkProductMaterialsQuantityAvailability(Integer drinkCount){
@@ -69,7 +73,7 @@ public class ProductBlackCoffeeImpl implements Product {
 
 	public ProductParameters getProductParameters(Integer drinkCount,  Double totalCurrentOrderCost){
 
-		wasteMaterial = new WasteMaterial();
+		productParameters = ProductParameters.getInstance();
 
 		productParameters.setBlackCoffeeCount(Optional.ofNullable(productParameters.getBlackCoffeeCount()).orElse(0) + drinkCount);
 		productParameters.setTotalBlackCoffeeCost(Optional.ofNullable(productParameters.getTotalBlackCoffeeCost()).orElse(0.0) + totalCurrentOrderCost);

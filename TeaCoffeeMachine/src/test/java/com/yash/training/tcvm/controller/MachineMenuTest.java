@@ -50,6 +50,7 @@ public class MachineMenuTest {
 	@Mock
 	private ProductBlackCoffeeImpl blackCoffeeImpl;
 
+	@Mock
 	private Container containerCapacity;
 
 	@Test

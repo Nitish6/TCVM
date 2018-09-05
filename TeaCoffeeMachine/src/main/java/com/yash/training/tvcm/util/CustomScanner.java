@@ -4,14 +4,14 @@ import java.util.Scanner;
 
 public class CustomScanner {
 
-	private final Scanner scanner;
+	public final Scanner scanner;
 
 	public CustomScanner() {
 
 		this(new Scanner(System.in));
 	}
 
-	CustomScanner(Scanner scanner) {
+	public CustomScanner(Scanner scanner) {
 
 		this.scanner = scanner;
 	}

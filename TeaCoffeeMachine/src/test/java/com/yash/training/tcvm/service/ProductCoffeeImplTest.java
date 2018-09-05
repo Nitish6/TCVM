@@ -13,10 +13,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.yash.training.tcvm.dao.ConsumptionMaterialQuantity;
 import com.yash.training.tcvm.dao.ProductCost;
+import com.yash.training.tcvm.dao.WasteMaterial;
 import com.yash.training.tcvm.domain.Container;
 import com.yash.training.tcvm.domain.ProductParameters;
 
@@ -41,6 +43,9 @@ public class ProductCoffeeImplTest {
 
 	@Mock
 	private ProductParameters productParameters;
+
+	@Mock
+	private WasteMaterial wasteMaterial;
 
 	@Before
 	public void shouldinitializeContainer(){
@@ -117,13 +122,42 @@ public class ProductCoffeeImplTest {
 		cost.put("black coffee", 10d);
 
 		when(productCost.getProductCost()).thenReturn(cost);
+		when(wasteMaterial.getCoffeeWastage()).thenReturn(getCoffeeWaste());
 
 		Double actualCost = coffeeImpl.getProductCost(drinkCount);
 
-		Double expectedCost = 30.0;
-
 		verify(productCost).getProductCost();
+		verify(wasteMaterial, Mockito.atLeast(3)).getCoffeeWastage();
 
-		assertEquals(expectedCost, actualCost);
+		assertEquals((Double)30.0, actualCost);
+	}
+
+	@Test
+	public void shouldReturnCountTotalCostTotalWastageOfCoffee(){
+
+		Integer drinkCount = 2;
+		Double currentOrderCost = 30.0;
+
+		when(wasteMaterial.getCoffeeWastage()).thenReturn(getCoffeeWaste());
+
+		ProductParameters actual = coffeeImpl.getProductParameters(drinkCount, currentOrderCost);
+
+		verify(wasteMaterial, Mockito.atLeast(4)).getCoffeeWastage();
+
+		assertEquals((Integer)2, actual.getCoffeeCount());
+		assertEquals(30.0, actual.getTotalCoffeeCost(), 0);
+
+	}
+
+	private Map<String, Double> getCoffeeWaste(){
+
+		Map<String, Double> wasteCoffeeIngredients = new HashMap<>();
+
+		wasteCoffeeIngredients.put("coffee", 1.0);
+		wasteCoffeeIngredients.put("water", 3.0);
+		wasteCoffeeIngredients.put("milk", 8.0);
+		wasteCoffeeIngredients.put("sugar", 2.0);
+
+		return wasteCoffeeIngredients;
 	}
 }

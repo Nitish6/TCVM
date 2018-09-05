@@ -13,10 +13,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.yash.training.tcvm.dao.ConsumptionMaterialQuantity;
 import com.yash.training.tcvm.dao.ProductCost;
+import com.yash.training.tcvm.dao.WasteMaterial;
 import com.yash.training.tcvm.domain.Container;
 import com.yash.training.tcvm.domain.ProductParameters;
 
@@ -41,6 +43,9 @@ public class ProductTeaImplTest {
 
 	@Mock
 	private ProductParameters productParameters;
+
+	@Mock
+	private WasteMaterial wasteMaterial;
 
 	@Before
 	public void shouldinitializeContainer(){
@@ -94,14 +99,13 @@ public class ProductTeaImplTest {
 		materialQuantityLeft.put("teaQuantityLeft", 1d);
 		materialQuantityLeft.put("milkQuantityLeft", 9d);
 		materialQuantityLeft.put("sugarQuantityLeft", 1d);
-		materialQuantityLeft.put("waterQuantityLeft", 1d);
+		materialQuantityLeft.put("waterQuantityLeft", 10d);
 		materialQuantityLeft.put("coffeeQuantityLeft", 2d);
 
 		when(consumption.teaConsumption()).thenReturn(ingredients);
 		when(materialManager.getMaterialQuantiyLeft(containerQuantity, ingredients, 8)).thenReturn(materialQuantityLeft);
 
 		teaImpl.checkProductMaterialsQuantityAvailability(8);
-
 	}
 
 	@Test
@@ -116,15 +120,43 @@ public class ProductTeaImplTest {
 		cost.put("black coffee", 10d);
 
 		when(productCost.getProductCost()).thenReturn(cost);
+		when(wasteMaterial.getTeaWastage()).thenReturn(getTeaWaste());
 
 		Double actualCost = teaImpl.getProductCost(drinkCount);
 
-		Double expectedCost = 20.0;
-
-		assertEquals(expectedCost, actualCost);
-
 		verify(productCost).getProductCost();
+		verify(wasteMaterial, Mockito.atLeast(4)).getTeaWastage();
+
+		assertEquals((Double)20.0, actualCost);
 
 	}
 
+	@Test
+	public void shouldReturnCountTotalCostTotalWastageOfTea(){
+
+		Integer drinkCount = 2;
+		Double currentOrderCost = 20.0;
+
+		when(wasteMaterial.getTeaWastage()).thenReturn(getTeaWaste());
+
+		ProductParameters actual = teaImpl.getProductParameters(drinkCount, currentOrderCost);
+
+		verify(wasteMaterial, Mockito.atLeast(4)).getTeaWastage();
+
+		assertEquals((Integer)2, actual.getTeaCount());
+		assertEquals(20.0, actual.getTotalTeaCost(), 0);
+
+	}
+
+	private Map<String, Double> getTeaWaste(){
+
+		Map<String, Double> wasteTeaIngredients = new HashMap<>();
+
+		wasteTeaIngredients.put("tea", 10.0);
+		wasteTeaIngredients.put("water", 5.0);
+		wasteTeaIngredients.put("milk", 4.0);
+		wasteTeaIngredients.put("sugar", 2.0);
+
+		return wasteTeaIngredients;
+	}
 }

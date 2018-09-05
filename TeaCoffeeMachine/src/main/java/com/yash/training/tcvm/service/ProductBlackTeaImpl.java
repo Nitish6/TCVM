@@ -26,13 +26,17 @@ public class ProductBlackTeaImpl implements Product {
 		this.productParameters = ProductParameters.getInstance();
 		this.materialManager = new MaterialManager();
 		this.productCost = new ProductCost();
+		this.wasteMaterial = new WasteMaterial();
 	} 
 
-	public ProductBlackTeaImpl(ProductParameters productParameters, ConsumptionMaterialQuantity consume, MaterialManager materialManager, ProductCost productCost) {
+	public ProductBlackTeaImpl(ProductParameters productParameters, ConsumptionMaterialQuantity consume,
+			MaterialManager materialManager, ProductCost productCost, WasteMaterial wasteMaterial) {
+
 		this.productParameters = productParameters;
 		this.consume = consume;
 		this.materialManager = materialManager;
 		this.productCost = productCost;
+		this.wasteMaterial = wasteMaterial;
 	}
 
 	public Boolean checkProductMaterialsQuantityAvailability(Integer drinkCount){
@@ -71,8 +75,7 @@ public class ProductBlackTeaImpl implements Product {
 
 	public ProductParameters getProductParameters(Integer drinkCount,  Double totalCurrentOrderCost){
 
-		wasteMaterial = new WasteMaterial();
-
+		productParameters = ProductParameters.getInstance();
 		productParameters.setBlackTeaCount(Optional.ofNullable(productParameters.getBlackTeaCount()).orElse(0) + drinkCount);
 		productParameters.setTotalBlackTeaCost(Optional.ofNullable(productParameters.getTotalBlackTeaCost()).orElse(0.0) + totalCurrentOrderCost);
 

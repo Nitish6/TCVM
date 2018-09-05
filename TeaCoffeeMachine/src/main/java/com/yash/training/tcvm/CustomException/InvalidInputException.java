@@ -1,6 +1,6 @@
 package com.yash.training.tcvm.CustomException;
 
-public class InvalidInputException extends Exception {
+public class InvalidInputException extends RuntimeException {
 
 	/**
 	 * 
